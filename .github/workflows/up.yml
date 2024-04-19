@@ -1,26 +1,42 @@
-name: Sync Public Repo to Private Repo
- 
+name: Sync with Upstream
+
 on:
-  push:
-    branches:
-      - main  # 你的默认分支，或者你想触发同步的分支
- 
+  schedule:
+    # 每天凌晨执行一次
+    - cron: '0 0 * * *'
+
 jobs:
-  sync-repo:
+  sync:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Private Repo
+      - name: Checkout local repository
         uses: actions/checkout@v2
         with:
-          ref: main  # 你想要同步到的分支
- 
-      - name: Sync Public Repo
-        uses: peaceiris/actions-gh-pages-sync@v3
-        with:
-          # 你的公开仓库的用户名、仓库名和分支
-          source_user: BlankTMing
-          source_repo: ManifestAutoUpdate
-          source_branch: 001000001000
- 
-          # 如果需要，可以设置GitHub Personal Access Token
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # 获取所有分支和提交历史
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'Your Name'
+          git config --global user.email 'your-email@example.com'
+          git remote add upstream https://github.com/BlankTMing/ManifestAutoUpdate.git # 替换为公开仓库的URL
+
+      - name: Fetch upstream branches
+        run: git fetch --all upstream
+
+      - name: Sync branches
+        run: |
+          # 遍历所有远程分支
+          for remote_branch in $(git branch -r upstream | grep -v HEAD); do
+            # 提取分支名
+            branch_name=${remote_branch#origin/}
+            # 检查本地是否存在该分支
+            if git show-ref --quiet refs/heads/$branch_name; then
+              echo "Branch $branch_name already exists, skipping."
+            else
+              # 如果不存在，则创建并推送本地分支到远程
+              git checkout -b $branch_name upstream/$branch_name
+              git push -u origin $branch_name
+              echo "Created and pushed branch $branch_name"
+            fi
+          done
