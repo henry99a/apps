@@ -20,7 +20,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: BlankTMing/ManifestAutoUpdate
-        ref: 001000001000 # or the branch you want to sync
+        ref: 839630 # or the branch you want to sync
         path: public-repository
 
     - name: Merge Public Repository
