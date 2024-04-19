@@ -27,8 +27,6 @@ jobs:
       run: |
         cd public-repository
         git fetch --all --prune
-        git checkout main # or the branch you want to sync
-        git merge --no-ff origin/main # or the branch you want to sync
         cd ..
         git add public-repository
         git commit -m "Sync public repository"
