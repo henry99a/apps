@@ -1,43 +1,40 @@
-name: Sync with Upstream
+name: Sync Public Repository
 
 on:
-  schedule:
-    # 每天凌晨执行一次
-    - cron: '0 0 * * *'
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout local repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # 获取所有分支和提交历史
+    - name: Checkout Your Repository
+      uses: actions/checkout@v2
 
-      - name: Set up Git
-        run: |
-          git config --global user.name 'Your Name'
-          git config --global user.email 'your-email@example.com'
-          git remote add upstream https://github.com/BlankTMing/ManifestAutoUpdate.git # 替换为公开仓库的URL
+    - name: Setup Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
 
-      - name: Fetch upstream branches
-        run: git fetch --all upstream
+    - name: Clone Public Repository
+      uses: actions/checkout@v2
+      with:
+        repository: BlankTMing/ManifestAutoUpdate
+        ref: 001000001000 # or the branch you want to sync
+        path: public-repository
 
-      - name: Sync branches
-        run: |
-          # 遍历所有远程分支
-          for remote_branch in $(git branch -r upstream | grep -v HEAD); do
-            # 提取分支名
-            branch_name=${remote_branch#origin/}
-            # 检查本地是否存在该分支
-            if git show-ref --quiet refs/heads/$branch_name; then
-              echo "Branch $branch_name already exists, skipping."
-            else
-              # 如果不存在，则创建并推送本地分支到远程
-              git checkout -b $branch_name upstream/$branch_name
-              git push -u origin $branch_name
-              echo "Created and pushed branch $branch_name"
-            fi
-          done
+    - name: Merge Public Repository
+      run: |
+        cd public-repository
+        git fetch --all --prune
+        git checkout main # or the branch you want to sync
+        git merge --no-ff origin/main # or the branch you want to sync
+        cd ..
+        git add public-repository
+        git commit -m "Sync public repository"
+
+    - name: Push Changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main # or the branch you want to sync
