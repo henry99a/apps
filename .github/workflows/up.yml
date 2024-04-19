@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Repo Mirror Sync
-      uses: kubeservice-stack/repos-mirror-action@<latest version>
+      uses: uses: kubeservice-stack/repos-mirror-action@v1.0.5
       with:
         # Such as https://github.com/dongjiang1989/mirror-action.git
         target-url: https://github.com/BlankTMing/ManifestAutoUpdate.git
