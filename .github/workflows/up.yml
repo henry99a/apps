@@ -16,6 +16,6 @@ jobs:
         # Such as https://github.com/dongjiang1989/mirror-action.git
         target-url: https://github.com/BlankTMing/ManifestAutoUpdate.git
         # Such as dongjiang1989
-        target-username: <target-username>
+        target-username: henry99a
         # You can store token in your project's 'Setting > Secrets' and reference the name here. Such as ${{ secrets.ACCESS_TOKEN }}
         target-token: <target-token>
