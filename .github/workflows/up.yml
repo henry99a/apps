@@ -1,20 +1,21 @@
-name: Clone All Branches
+name: <action-name>
 
-on:
-  workflow_dispatch:
+on: 
+  - push
+  - delete
 
 jobs:
-  clone:
+  sync:
     runs-on: ubuntu-latest
-
+    name: Repo Mirror Sync
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Clone all branches
-      run: |
-        git fetch --all
-        for branch in `git branch -a | grep remotes | grep -v HEAD | grep -v master`; do
-          git branch --track ${branch#remotes/origin/} $branch
-        done
-        git pull --all
+    - uses: actions/checkout@v3
+    - name: Repo Mirror Sync
+      uses: kubeservice-stack/repos-mirror-action@<latest version>
+      with:
+        # Such as https://github.com/dongjiang1989/mirror-action.git
+        target-url: https://github.com/BlankTMing/ManifestAutoUpdate.git
+        # Such as dongjiang1989
+        target-username: <target-username>
+        # You can store token in your project's 'Setting > Secrets' and reference the name here. Such as ${{ secrets.ACCESS_TOKEN }}
+        target-token: <target-token>
